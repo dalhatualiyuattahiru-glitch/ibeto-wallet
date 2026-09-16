@@ -1,12 +1,9 @@
 {
-  "name": "ibeto-backend",
+  "name": "ibeto-wallet",
   "version": "1.0.0",
-  "description": "Zero-dependency Node.js backend for the ibeto wallet app",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "engines": {
-    "node": ">=18"
+  "private": true,
+  "description": "ibeto wallet app — static frontend + Netlify Functions backend",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
   }
 }
