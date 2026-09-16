@@ -10,7 +10,6 @@
  */
 
 const crypto = require('crypto');
-const { connectLambda, getStore } = require('@netlify/blobs');
 
 const TOKEN_SECRET = process.env.WALLET_TOKEN_SECRET || 'ibeto-demo-secret-change-me';
 const TOKEN_TTL_MS = 1000 * 60 * 60 * 12; // 12 hours
@@ -20,19 +19,24 @@ const DB_KEY = 'state';
 // Store access
 // ---------------------------------------------------------------------
 
-function store(event) {
+// Loaded with a dynamic import() rather than require(): @netlify/blobs
+// ships in a module format that Node's CommonJS require() can fail to
+// resolve inside a bundled Lambda function, even though the package is
+// physically present. Dynamic import() uses ESM resolution and avoids it.
+async function store(event) {
+  const { connectLambda, getStore } = await import('@netlify/blobs');
   connectLambda(event); // configures the Blobs environment from the Lambda event
   return getStore('wallet-db');
 }
 
 async function readDB(event) {
-  const s = store(event);
+  const s = await store(event);
   const data = await s.get(DB_KEY, { type: 'json' });
   return data || { users: [], transactions: [] };
 }
 
 async function writeDB(event, db) {
-  const s = store(event);
+  const s = await store(event);
   await s.setJSON(DB_KEY, db);
 }
 
