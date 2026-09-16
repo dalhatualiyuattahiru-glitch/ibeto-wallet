@@ -5,6 +5,7 @@
 
 [functions]
   node_bundler = "esbuild"
+  external_node_modules = ["@netlify/blobs"]
 
 # The frontend calls /api/register, /api/login, etc. This forwards each
 # of those to the Netlify Function of the same name (e.g. /api/pay-bill
