@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>ibeto — Wallet</title>
+<link rel="icon" type="image/png" href="assets/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ============ AUTH VIEW ============ -->
+<section id="auth-view" class="screen">
+  <div class="auth-card">
+    <div class="brand">
+      <img src="assets/icon.png" alt="" class="brand-mark" />
+      <span class="brand-name">ibeto</span>
+    </div>
+
+    <div class="auth-tabs" role="tablist">
+      <button class="auth-tab is-active" data-tab="login" role="tab" aria-selected="true">Sign in</button>
+      <button class="auth-tab" data-tab="register" role="tab" aria-selected="false">Open a wallet</button>
+    </div>
+
+    <form id="login-form" class="auth-form" novalidate>
+      <label class="field">
+        <span>Email</span>
+        <input type="email" name="email" autocomplete="email" required />
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input type="password" name="password" autocomplete="current-password" required />
+      </label>
+      <p class="form-error" data-error-for="login"></p>
+      <button type="submit" class="btn btn-primary">Sign in</button>
+      <p class="auth-hint">New here? Use the "Open a wallet" tab above.</p>
+    </form>
+
+    <form id="register-form" class="auth-form is-hidden" novalidate>
+      <label class="field">
+        <span>Full name</span>
+        <input type="text" name="name" autocomplete="name" required />
+      </label>
+      <label class="field">
+        <span>Email</span>
+        <input type="email" name="email" autocomplete="email" required />
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input type="password" name="password" autocomplete="new-password" minlength="6" required />
+        <small>At least 6 characters.</small>
+      </label>
+      <p class="form-error" data-error-for="register"></p>
+      <button type="submit" class="btn btn-primary">Create wallet</button>
+    </form>
+  </div>
+</section>
+
+<!-- ============ APP VIEW ============ -->
+<section id="app-view" class="screen is-hidden">
+  <header class="app-header">
+    <div class="app-header-identity">
+      <img src="assets/icon.png" alt="" class="header-mark" />
+      <div>
+        <p class="eyebrow">Welcome back</p>
+        <h1 id="user-name">—</h1>
+      </div>
+    </div>
+    <button id="logout-btn" class="icon-btn" aria-label="Sign out" title="Sign out">⏻</button>
+  </header>
+
+  <div class="balance-panel">
+    <p class="balance-label">Available balance</p>
+    <p class="balance-amount"><span class="currency">£</span><span id="balance-value">0.00</span></p>
+    <p class="account-number">Account no. <span id="account-number">—</span></p>
+
+    <div class="action-row">
+      <button class="action-btn" data-open="fund">
+        <span class="action-icon">+</span>
+        <span>Fund</span>
+      </button>
+      <button class="action-btn" data-open="transfer">
+        <span class="action-icon">↗</span>
+        <span>Transfer</span>
+      </button>
+      <button class="action-btn" data-open="withdraw">
+        <span class="action-icon">↓</span>
+        <span>Withdraw</span>
+      </button>
+      <button class="action-btn" data-open="bill">
+        <span class="action-icon">▤</span>
+        <span>Pay bill</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="ledger">
+    <div class="ledger-heading">
+      <h2>Transaction history</h2>
+    </div>
+    <ul id="transaction-list" class="ledger-list"></ul>
+    <p id="empty-state" class="empty-state is-hidden">No transactions yet. Fund your wallet to get started.</p>
+  </div>
+</section>
+
+<!-- ============ BOTTOM SHEETS ============ -->
+<div id="sheet-backdrop" class="sheet-backdrop is-hidden"></div>
+
+<div id="sheet-fund" class="sheet is-hidden" role="dialog" aria-labelledby="fund-title">
+  <div class="sheet-handle"></div>
+  <h3 id="fund-title">Fund wallet</h3>
+  <p class="sheet-sub">Simulated top-up — no real card is charged.</p>
+  <form data-form="fund">
+    <label class="field">
+      <span>Amount (£)</span>
+      <input type="number" name="amount" min="1" step="0.01" required />
+    </label>
+    <label class="field">
+      <span>Funding source</span>
+      <select name="source">
+        <option>Debit card ••4242</option>
+        <option>Linked bank account</option>
+      </select>
+    </label>
+    <p class="form-error" data-error-for="fund"></p>
+    <button type="submit" class="btn btn-primary">Add money</button>
+  </form>
+</div>
+
+<div id="sheet-transfer" class="sheet is-hidden" role="dialog" aria-labelledby="transfer-title">
+  <div class="sheet-handle"></div>
+  <h3 id="transfer-title">Transfer money</h3>
+  <p class="sheet-sub">Send to another Ledger wallet by email or account number.</p>
+  <form data-form="transfer">
+    <label class="field">
+      <span>Recipient email or account no.</span>
+      <input type="text" name="recipient" required />
+    </label>
+    <label class="field">
+      <span>Amount (£)</span>
+      <input type="number" name="amount" min="1" step="0.01" required />
+    </label>
+    <label class="field">
+      <span>Note (optional)</span>
+      <input type="text" name="note" maxlength="80" />
+    </label>
+    <p class="form-error" data-error-for="transfer"></p>
+    <button type="submit" class="btn btn-primary">Send transfer</button>
+  </form>
+</div>
+
+<div id="sheet-withdraw" class="sheet is-hidden" role="dialog" aria-labelledby="withdraw-title">
+  <div class="sheet-handle"></div>
+  <h3 id="withdraw-title">Withdraw to bank</h3>
+  <p class="sheet-sub">Simulated payout — no real bank transfer is sent.</p>
+  <form data-form="withdraw">
+    <label class="field">
+      <span>Amount (£)</span>
+      <input type="number" name="amount" min="1" step="0.01" required />
+    </label>
+    <label class="field">
+      <span>Bank name</span>
+      <input type="text" name="bankName" required />
+    </label>
+    <label class="field">
+      <span>Account number</span>
+      <input type="text" name="accountNumber" inputmode="numeric" required />
+    </label>
+    <p class="form-error" data-error-for="withdraw"></p>
+    <button type="submit" class="btn btn-primary">Withdraw</button>
+  </form>
+</div>
+
+<div id="sheet-bill" class="sheet is-hidden" role="dialog" aria-labelledby="bill-title">
+  <div class="sheet-handle"></div>
+  <h3 id="bill-title">Pay a bill</h3>
+  <p class="sheet-sub">Simulated payment — no real biller is contacted.</p>
+  <form data-form="bill">
+    <label class="field">
+      <span>Bill type</span>
+      <select name="billType">
+        <option>Electricity</option>
+        <option>Water</option>
+        <option>Internet</option>
+        <option>Mobile airtime</option>
+        <option>Cable TV</option>
+      </select>
+    </label>
+    <label class="field">
+      <span>Provider</span>
+      <input type="text" name="provider" placeholder="e.g. National Grid" required />
+    </label>
+    <label class="field">
+      <span>Customer / account ID</span>
+      <input type="text" name="customerId" required />
+    </label>
+    <label class="field">
+      <span>Amount (£)</span>
+      <input type="number" name="amount" min="1" step="0.01" required />
+    </label>
+    <p class="form-error" data-error-for="bill"></p>
+    <button type="submit" class="btn btn-primary">Pay bill</button>
+  </form>
+</div>
+
+<div id="toast" class="toast is-hidden"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
