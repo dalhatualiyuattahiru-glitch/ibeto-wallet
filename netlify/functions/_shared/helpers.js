@@ -5,15 +5,26 @@
  * Netlify) instead of a local JSON file, because serverless functions
  * don't share a filesystem between invocations.
  *
- * ⚠️ Prototype-grade backend: funding, withdrawals, and bill payments are
- * SIMULATED. No real bank, card, or biller is ever contacted.
+ * Prototype-grade backend:
+ * - Funding, withdrawals, and bill payments are SIMULATED. No real bank,
+ *   card, or biller is ever contacted.
+ * - OTP delivery is SIMULATED. There's no SMS provider connected, so the
+ *   generated code is returned directly in the API response (clearly
+ *   marked "demo mode" in the UI) instead of being texted. Swapping in a
+ *   real provider (Termii, Twilio, etc.) later just means changing
+ *   request-otp.js to call their API instead of returning the code.
  */
 
 const crypto = require('crypto');
 
 const TOKEN_SECRET = process.env.WALLET_TOKEN_SECRET || 'ibeto-demo-secret-change-me';
 const TOKEN_TTL_MS = 1000 * 60 * 60 * 12; // 12 hours
+const OTP_TTL_MS = 1000 * 60 * 5; // 5 minutes to enter the code
+const OTP_VERIFIED_TTL_MS = 1000 * 60 * 15; // 15 minutes to finish registering after verifying
 const DB_KEY = 'state';
+function getAdminPhone() {
+  return (process.env.ADMIN_PHONE || '').replace(/\D/g, '');
+}
 
 // ---------------------------------------------------------------------
 // Store access
@@ -25,14 +36,14 @@ const DB_KEY = 'state';
 // physically present. Dynamic import() uses ESM resolution and avoids it.
 async function store(event) {
   const { connectLambda, getStore } = await import('@netlify/blobs');
-  connectLambda(event); // configures the Blobs environment from the Lambda event
+  connectLambda(event);
   return getStore('wallet-db');
 }
 
 async function readDB(event) {
   const s = await store(event);
   const data = await s.get(DB_KEY, { type: 'json' });
-  return data || { users: [], transactions: [] };
+  return data || { users: [], transactions: [], otps: {} };
 }
 
 async function writeDB(event, db) {
@@ -41,17 +52,18 @@ async function writeDB(event, db) {
 }
 
 // ---------------------------------------------------------------------
-// Password hashing (scrypt) — no plaintext passwords are ever stored
+// Password / PIN hashing (scrypt) - never stored in plain text
 // ---------------------------------------------------------------------
 
-function hashPassword(password) {
+function hashSecret(secret) {
   const salt = crypto.randomBytes(16).toString('hex');
-  const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+  const hash = crypto.scryptSync(String(secret), salt, 64).toString('hex');
   return { salt, hash };
 }
 
-function verifyPassword(password, salt, hash) {
-  const check = crypto.scryptSync(password, salt, 64).toString('hex');
+function verifySecret(secret, salt, hash) {
+  if (!salt || !hash) return false;
+  const check = crypto.scryptSync(String(secret), salt, 64).toString('hex');
   return crypto.timingSafeEqual(Buffer.from(check), Buffer.from(hash));
 }
 
@@ -86,19 +98,37 @@ function getAuthedUser(event, db) {
 }
 
 // ---------------------------------------------------------------------
+// Phone numbers / OTP
+// ---------------------------------------------------------------------
+
+// Normalize to digits only, e.g. "+234 702 632 7275" -> "2347026327275".
+// Used as the account number too (like OPay), so it doubles as the
+// identifier people transfer money to.
+function normalizePhone(phone) {
+  return String(phone || '').replace(/\D/g, '');
+}
+
+function isValidPhone(phone) {
+  const digits = normalizePhone(phone);
+  return digits.length >= 10 && digits.length <= 15;
+}
+
+function generateOtp() {
+  return String(crypto.randomInt(100000, 999999));
+}
+
+function maskPhone(phone) {
+  const digits = normalizePhone(phone);
+  if (digits.length < 6) return digits;
+  return `${digits.slice(0, 3)}****${digits.slice(-3)}`;
+}
+
+// ---------------------------------------------------------------------
 // Misc helpers
 // ---------------------------------------------------------------------
 
 function genId() {
   return crypto.randomUUID();
-}
-
-function genAccountNumber(db) {
-  let acc;
-  do {
-    acc = String(Math.floor(1000000000 + Math.random() * 9000000000));
-  } while (db.users.some((u) => u.accountNumber === acc));
-  return acc;
 }
 
 function isValidEmail(email) {
@@ -113,9 +143,19 @@ function publicUser(user) {
   return {
     id: user.id,
     name: user.name,
-    email: user.email,
+    phone: user.phone,
+    maskedPhone: maskPhone(user.phone),
+    email: user.email || null,
     accountNumber: user.accountNumber,
     balance: user.balanceCents / 100,
+    tier: user.tier || 1,
+    isAdmin: !!user.isAdmin,
+    pinSet: !!user.pinHash,
+    gender: user.gender || null,
+    dateOfBirth: user.dateOfBirth || null,
+    address: user.address || null,
+    photo: user.photo || null,
+    favorites: user.favorites || [],
     createdAt: user.createdAt,
   };
 }
@@ -143,20 +183,38 @@ function parseBody(event) {
   }
 }
 
+function findUserByIdentifier(db, identifier) {
+  const raw = String(identifier || '').trim().toLowerCase();
+  const digits = normalizePhone(identifier);
+  return db.users.find(
+    (u) =>
+      (u.email && u.email.toLowerCase() === raw) ||
+      u.accountNumber === digits ||
+      u.phone === digits
+  );
+}
+
 module.exports = {
   readDB,
   writeDB,
-  hashPassword,
-  verifyPassword,
+  hashSecret,
+  verifySecret,
   createToken,
   verifyToken,
   getAuthedUser,
   genId,
-  genAccountNumber,
   isValidEmail,
+  normalizePhone,
+  isValidPhone,
+  generateOtp,
+  maskPhone,
   toCents,
   publicUser,
   recordTransaction,
   json,
   parseBody,
+  findUserByIdentifier,
+  getAdminPhone,
+  OTP_TTL_MS,
+  OTP_VERIFIED_TTL_MS,
 };
