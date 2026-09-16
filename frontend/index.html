@@ -12,23 +12,66 @@
 </head>
 <body>
 
-<!-- ============ AUTH VIEW ============ -->
-<section id="auth-view" class="screen">
+<!-- ============ RETURNING USER (device unlock) ============ -->
+<section id="returning-view" class="screen is-hidden">
+  <div class="auth-card">
+    <div class="brand brand-center">
+      <img src="assets/icon.png" alt="" class="brand-mark" />
+      <span class="brand-name">ibeto</span>
+    </div>
+    <div class="returning-avatar" id="returning-avatar">A</div>
+    <p class="returning-name" id="returning-name">—</p>
+    <p class="returning-phone" id="returning-phone">—</p>
+
+    <button id="fingerprint-btn" class="fingerprint-btn is-hidden" type="button">
+      <span class="fingerprint-icon">⚿</span>
+      <span>Verify Fingerprint</span>
+    </button>
+    <p id="returning-error" class="form-error"></p>
+
+    <div class="returning-links">
+      <button id="switch-account-btn" class="link-btn" type="button">Switch account</button>
+      <span class="dot">·</span>
+      <button id="login-password-btn" class="link-btn" type="button">Login with password</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PHONE ENTRY ============ -->
+<section id="phone-view" class="screen is-hidden">
   <div class="auth-card">
     <div class="brand">
       <img src="assets/icon.png" alt="" class="brand-mark" />
       <span class="brand-name">ibeto</span>
     </div>
+    <h2 class="auth-title">Enter your phone number</h2>
+    <p class="auth-sub">We'll send a code to verify it's you.</p>
+    <form id="phone-form" class="auth-form" novalidate>
+      <label class="field">
+        <span>Phone number</span>
+        <input type="tel" name="phone" inputmode="tel" autocomplete="tel" placeholder="e.g. 08012345678" required />
+      </label>
+      <p class="form-error" data-error-for="phone"></p>
+      <button type="submit" class="btn btn-primary">Send code</button>
+    </form>
+    <p class="auth-hint">
+      <button id="have-account-btn" class="link-btn" type="button">Already have a wallet? Sign in</button>
+    </p>
+  </div>
+</section>
 
-    <div class="auth-tabs" role="tablist">
-      <button class="auth-tab is-active" data-tab="login" role="tab" aria-selected="true">Sign in</button>
-      <button class="auth-tab" data-tab="register" role="tab" aria-selected="false">Open a wallet</button>
+<!-- ============ PHONE + PASSWORD LOGIN ============ -->
+<section id="login-view" class="screen is-hidden">
+  <div class="auth-card">
+    <div class="brand">
+      <img src="assets/icon.png" alt="" class="brand-mark" />
+      <span class="brand-name">ibeto</span>
     </div>
-
+    <h2 class="auth-title">Sign in</h2>
     <form id="login-form" class="auth-form" novalidate>
       <label class="field">
-        <span>Email</span>
-        <input type="email" name="email" autocomplete="email" required />
+        <span>Phone number</span>
+        <input type="tel" name="phone" inputmode="tel" autocomplete="tel" required />
       </label>
       <label class="field">
         <span>Password</span>
@@ -36,24 +79,63 @@
       </label>
       <p class="form-error" data-error-for="login"></p>
       <button type="submit" class="btn btn-primary">Sign in</button>
-      <p class="auth-hint">New here? Use the "Open a wallet" tab above.</p>
     </form>
+    <p class="auth-hint">
+      <button id="new-wallet-btn" class="link-btn" type="button">New here? Open a wallet</button>
+    </p>
+  </div>
+</section>
 
-    <form id="register-form" class="auth-form is-hidden" novalidate>
+<!-- ============ OTP VERIFY ============ -->
+<section id="otp-view" class="screen is-hidden">
+  <div class="auth-card">
+    <div class="brand">
+      <img src="assets/icon.png" alt="" class="brand-mark" />
+      <span class="brand-name">ibeto</span>
+    </div>
+    <h2 class="auth-title">Enter the code</h2>
+    <p class="auth-sub">Sent to <span id="otp-phone-display">—</span></p>
+    <p class="demo-note" id="otp-demo-note"></p>
+    <form id="otp-form" class="auth-form" novalidate>
+      <label class="field">
+        <span>6-digit code</span>
+        <input type="text" name="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required />
+      </label>
+      <p class="form-error" data-error-for="otp"></p>
+      <button type="submit" class="btn btn-primary">Verify</button>
+    </form>
+    <p class="auth-hint">
+      <button id="resend-otp-btn" class="link-btn" type="button">Resend code</button>
+      <span class="dot">·</span>
+      <button id="change-phone-btn" class="link-btn" type="button">Change number</button>
+    </p>
+  </div>
+</section>
+
+<!-- ============ SIGNUP DETAILS ============ -->
+<section id="details-view" class="screen is-hidden">
+  <div class="auth-card">
+    <div class="brand">
+      <img src="assets/icon.png" alt="" class="brand-mark" />
+      <span class="brand-name">ibeto</span>
+    </div>
+    <h2 class="auth-title">Create your wallet</h2>
+    <form id="details-form" class="auth-form" novalidate>
       <label class="field">
         <span>Full name</span>
         <input type="text" name="name" autocomplete="name" required />
-      </label>
-      <label class="field">
-        <span>Email</span>
-        <input type="email" name="email" autocomplete="email" required />
       </label>
       <label class="field">
         <span>Password</span>
         <input type="password" name="password" autocomplete="new-password" minlength="6" required />
         <small>At least 6 characters.</small>
       </label>
-      <p class="form-error" data-error-for="register"></p>
+      <label class="field">
+        <span>4-digit transaction PIN</span>
+        <input type="password" name="pin" inputmode="numeric" maxlength="4" pattern="\d{4}" required />
+        <small>You'll use this to approve transfers, withdrawals, and bill payments.</small>
+      </label>
+      <p class="form-error" data-error-for="details"></p>
       <button type="submit" class="btn btn-primary">Create wallet</button>
     </form>
   </div>
@@ -61,49 +143,192 @@
 
 <!-- ============ APP VIEW ============ -->
 <section id="app-view" class="screen is-hidden">
-  <header class="app-header">
-    <div class="app-header-identity">
-      <img src="assets/icon.png" alt="" class="header-mark" />
-      <div>
-        <p class="eyebrow">Welcome back</p>
-        <h1 id="user-name">—</h1>
+
+  <div id="page-dashboard" class="page">
+    <header class="app-header">
+      <div class="app-header-identity">
+        <div>
+          <p class="eyebrow">Hi,</p>
+          <h1 id="user-name">—</h1>
+        </div>
+      </div>
+      <button id="notif-btn" class="icon-btn" aria-label="Notifications" title="Notifications">🔔</button>
+    </header>
+
+    <div class="balance-panel">
+      <div class="balance-top">
+        <p class="balance-label">Available balance</p>
+        <button id="toggle-balance-btn" class="eye-btn" aria-label="Show or hide balance">👁</button>
+      </div>
+      <p class="balance-amount"><span class="currency">₦</span><span id="balance-value">0.00</span></p>
+      <div class="balance-sub-row">
+        <p class="account-number">Account no. <span id="account-number">—</span></p>
+        <button id="history-link-btn" class="text-link">Transaction history ›</button>
+      </div>
+
+      <div class="action-row">
+        <button class="action-btn" data-open="fund">
+          <span class="action-icon">+</span>
+          <span>Fund</span>
+        </button>
+        <button class="action-btn" data-open="transfer">
+          <span class="action-icon">↗</span>
+          <span>Transfer</span>
+        </button>
+        <button class="action-btn" data-open="withdraw">
+          <span class="action-icon">↓</span>
+          <span>Withdraw</span>
+        </button>
+        <button class="action-btn" data-open="bill">
+          <span class="action-icon">▤</span>
+          <span>Pay bill</span>
+        </button>
       </div>
     </div>
-    <button id="logout-btn" class="icon-btn" aria-label="Sign out" title="Sign out">⏻</button>
-  </header>
 
-  <div class="balance-panel">
-    <p class="balance-label">Available balance</p>
-    <p class="balance-amount"><span class="currency">£</span><span id="balance-value">0.00</span></p>
-    <p class="account-number">Account no. <span id="account-number">—</span></p>
-
-    <div class="action-row">
-      <button class="action-btn" data-open="fund">
-        <span class="action-icon">+</span>
-        <span>Fund</span>
-      </button>
-      <button class="action-btn" data-open="transfer">
-        <span class="action-icon">↗</span>
-        <span>Transfer</span>
-      </button>
-      <button class="action-btn" data-open="withdraw">
-        <span class="action-icon">↓</span>
-        <span>Withdraw</span>
-      </button>
-      <button class="action-btn" data-open="bill">
-        <span class="action-icon">▤</span>
-        <span>Pay bill</span>
-      </button>
+    <div class="ledger">
+      <div class="ledger-heading">
+        <h2>Recent activity</h2>
+      </div>
+      <ul id="transaction-list" class="ledger-list"></ul>
+      <p id="empty-state" class="empty-state is-hidden">No transactions yet. Fund your wallet to get started.</p>
     </div>
   </div>
 
-  <div class="ledger">
-    <div class="ledger-heading">
-      <h2>Transaction history</h2>
-    </div>
-    <ul id="transaction-list" class="ledger-list"></ul>
-    <p id="empty-state" class="empty-state is-hidden">No transactions yet. Fund your wallet to get started.</p>
+  <div id="page-history" class="page is-hidden">
+    <header class="sub-header">
+      <button class="icon-btn" data-back>‹</button>
+      <h1>Transaction history</h1>
+    </header>
+    <ul id="full-transaction-list" class="ledger-list ledger-list-page"></ul>
   </div>
+
+  <div id="page-profile" class="page is-hidden">
+    <header class="sub-header">
+      <button class="icon-btn" data-back>‹</button>
+      <h1>My Profile</h1>
+    </header>
+
+    <div class="profile-photo-wrap">
+      <label for="photo-input" class="profile-photo">
+        <img id="profile-photo-img" src="" alt="" class="is-hidden" />
+        <span id="profile-photo-fallback">👤</span>
+        <span class="photo-cam">📷</span>
+      </label>
+      <input type="file" id="photo-input" accept="image/*" class="is-hidden" />
+      <p class="profile-name" id="profile-name-display">—</p>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-row">
+        <span>Account number</span>
+        <span id="profile-account-number" class="detail-value">—</span>
+      </div>
+      <div class="detail-row">
+        <span>Tier</span>
+        <span class="tier-badge">Tier <span id="profile-tier">1</span></span>
+      </div>
+    </div>
+
+    <form id="profile-form" class="detail-card detail-form">
+      <label class="detail-row detail-row-edit">
+        <span>Full name</span>
+        <input type="text" name="name" />
+      </label>
+      <div class="detail-row">
+        <span>Phone number</span>
+        <span id="profile-phone" class="detail-value">—</span>
+      </div>
+      <div class="detail-row">
+        <span>Email</span>
+        <button type="button" id="email-action-btn" class="text-link">Add email</button>
+      </div>
+      <label class="detail-row detail-row-edit">
+        <span>Gender</span>
+        <select name="gender">
+          <option value="">Not set</option>
+          <option>Female</option>
+          <option>Male</option>
+          <option>Prefer not to say</option>
+        </select>
+      </label>
+      <label class="detail-row detail-row-edit">
+        <span>Date of birth</span>
+        <input type="date" name="dateOfBirth" />
+      </label>
+      <label class="detail-row detail-row-edit">
+        <span>Address</span>
+        <input type="text" name="address" placeholder="Not set" />
+      </label>
+      <p class="form-error" data-error-for="profile"></p>
+      <button type="submit" class="btn btn-primary btn-block">Save changes</button>
+    </form>
+  </div>
+
+  <div id="page-settings" class="page is-hidden">
+    <header class="sub-header">
+      <button class="icon-btn" data-back>‹</button>
+      <h1>Settings</h1>
+    </header>
+
+    <div class="settings-group">
+      <button class="settings-row" data-nav="profile"><span>My Profile</span><span class="chev">›</span></button>
+      <button class="settings-row" data-alert="Payment settings are coming soon."><span>Payment Settings</span><span class="chev">›</span></button>
+      <button class="settings-row" data-open="pin"><span>Transaction PIN</span><span class="chev">›</span></button>
+      <button class="settings-row" data-nav="favorites"><span>Saved Recipients</span><span class="chev">›</span></button>
+    </div>
+
+    <div class="settings-group">
+      <button class="settings-row" data-alert="SMS alert settings are coming soon."><span>SMS Alert Settings</span><span class="chev">›</span></button>
+      <button class="settings-row" data-alert="Extra security options are coming soon."><span>Security Plus</span><span class="chev">›</span></button>
+      <button class="settings-row" data-alert="Theme options are coming soon."><span>Themes</span><span class="chev">›</span></button>
+    </div>
+
+    <div class="settings-group" id="admin-settings-group">
+      <button class="settings-row" data-nav="admin"><span>Admin Panel</span><span class="chev">›</span></button>
+    </div>
+
+    <div class="settings-group">
+      <button class="settings-row" data-alert="Support is coming soon."><span>Feedback and Suggestions</span><span class="chev">›</span></button>
+    </div>
+
+    <div class="settings-group">
+      <button class="settings-row settings-row-danger" id="signout-btn"><span>Sign Out</span></button>
+    </div>
+  </div>
+
+  <div id="page-favorites" class="page is-hidden">
+    <header class="sub-header">
+      <button class="icon-btn" data-back>‹</button>
+      <h1>Saved Recipients</h1>
+    </header>
+    <ul id="favorites-list" class="ledger-list ledger-list-page"></ul>
+    <p id="favorites-empty" class="empty-state is-hidden">No saved recipients yet. Save one from the Transfer screen.</p>
+  </div>
+
+  <div id="page-admin" class="page is-hidden">
+    <header class="sub-header">
+      <button class="icon-btn" data-back>‹</button>
+      <h1>Admin Panel</h1>
+    </header>
+    <div id="admin-user-list-wrap">
+      <p class="admin-sub">All registered wallets</p>
+      <ul id="admin-user-list" class="ledger-list ledger-list-page"></ul>
+    </div>
+    <div id="admin-user-detail-wrap" class="is-hidden">
+      <button id="admin-back-to-list" class="text-link" type="button">‹ All users</button>
+      <h2 id="admin-detail-name" class="admin-detail-name">—</h2>
+      <p id="admin-detail-meta" class="admin-detail-meta">—</p>
+      <ul id="admin-detail-transactions" class="ledger-list ledger-list-page"></ul>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn is-active" data-nav="dashboard"><span class="nav-icon">🏠</span><span>Home</span></button>
+    <button class="nav-btn" data-nav="history"><span class="nav-icon">📄</span><span>History</span></button>
+    <button class="nav-btn" data-nav="profile"><span class="nav-icon">👤</span><span>Profile</span></button>
+    <button class="nav-btn" data-nav="settings"><span class="nav-icon">⚙</span><span>Settings</span></button>
+  </nav>
 </section>
 
 <!-- ============ BOTTOM SHEETS ============ -->
@@ -115,7 +340,7 @@
   <p class="sheet-sub">Simulated top-up — no real card is charged.</p>
   <form data-form="fund">
     <label class="field">
-      <span>Amount (£)</span>
+      <span>Amount (₦)</span>
       <input type="number" name="amount" min="1" step="0.01" required />
     </label>
     <label class="field">
@@ -133,19 +358,28 @@
 <div id="sheet-transfer" class="sheet is-hidden" role="dialog" aria-labelledby="transfer-title">
   <div class="sheet-handle"></div>
   <h3 id="transfer-title">Transfer money</h3>
-  <p class="sheet-sub">Send to another Ledger wallet by email or account number.</p>
+  <p class="sheet-sub">Send to another ibeto wallet by phone, account number, or email.</p>
   <form data-form="transfer">
     <label class="field">
-      <span>Recipient email or account no.</span>
+      <span>Recipient</span>
       <input type="text" name="recipient" required />
     </label>
+    <div id="favorites-quickpick" class="favorites-quickpick"></div>
     <label class="field">
-      <span>Amount (£)</span>
+      <span>Amount (₦)</span>
       <input type="number" name="amount" min="1" step="0.01" required />
     </label>
     <label class="field">
       <span>Note (optional)</span>
       <input type="text" name="note" maxlength="80" />
+    </label>
+    <label class="field">
+      <span>Transaction PIN</span>
+      <input type="password" name="pin" inputmode="numeric" maxlength="4" required />
+    </label>
+    <label class="checkbox-field">
+      <input type="checkbox" name="saveFavorite" />
+      <span>Save this recipient</span>
     </label>
     <p class="form-error" data-error-for="transfer"></p>
     <button type="submit" class="btn btn-primary">Send transfer</button>
@@ -158,7 +392,7 @@
   <p class="sheet-sub">Simulated payout — no real bank transfer is sent.</p>
   <form data-form="withdraw">
     <label class="field">
-      <span>Amount (£)</span>
+      <span>Amount (₦)</span>
       <input type="number" name="amount" min="1" step="0.01" required />
     </label>
     <label class="field">
@@ -168,6 +402,10 @@
     <label class="field">
       <span>Account number</span>
       <input type="text" name="accountNumber" inputmode="numeric" required />
+    </label>
+    <label class="field">
+      <span>Transaction PIN</span>
+      <input type="password" name="pin" inputmode="numeric" maxlength="4" required />
     </label>
     <p class="form-error" data-error-for="withdraw"></p>
     <button type="submit" class="btn btn-primary">Withdraw</button>
@@ -191,18 +429,54 @@
     </label>
     <label class="field">
       <span>Provider</span>
-      <input type="text" name="provider" placeholder="e.g. National Grid" required />
+      <input type="text" name="provider" placeholder="e.g. Ikeja Electric" required />
     </label>
     <label class="field">
       <span>Customer / account ID</span>
       <input type="text" name="customerId" required />
     </label>
     <label class="field">
-      <span>Amount (£)</span>
+      <span>Amount (₦)</span>
       <input type="number" name="amount" min="1" step="0.01" required />
+    </label>
+    <label class="field">
+      <span>Transaction PIN</span>
+      <input type="password" name="pin" inputmode="numeric" maxlength="4" required />
     </label>
     <p class="form-error" data-error-for="bill"></p>
     <button type="submit" class="btn btn-primary">Pay bill</button>
+  </form>
+</div>
+
+<div id="sheet-pin" class="sheet is-hidden" role="dialog" aria-labelledby="pin-title">
+  <div class="sheet-handle"></div>
+  <h3 id="pin-title">Transaction PIN</h3>
+  <p class="sheet-sub" id="pin-sub">Set the 4-digit PIN used to approve transfers, withdrawals, and bill payments.</p>
+  <form data-form="pin">
+    <label class="field is-hidden" id="current-pin-field">
+      <span>Current PIN</span>
+      <input type="password" name="currentPin" inputmode="numeric" maxlength="4" />
+    </label>
+    <label class="field">
+      <span>New 4-digit PIN</span>
+      <input type="password" name="pin" inputmode="numeric" maxlength="4" required />
+    </label>
+    <p class="form-error" data-error-for="pin"></p>
+    <button type="submit" class="btn btn-primary">Save PIN</button>
+  </form>
+</div>
+
+<div id="sheet-email" class="sheet is-hidden" role="dialog" aria-labelledby="email-title">
+  <div class="sheet-handle"></div>
+  <h3 id="email-title">Link an email</h3>
+  <p class="sheet-sub">Optional — add it any time to get updates and account recovery.</p>
+  <form data-form="email">
+    <label class="field">
+      <span>Email address</span>
+      <input type="email" name="email" required />
+    </label>
+    <p class="form-error" data-error-for="email"></p>
+    <button type="submit" class="btn btn-primary">Save email</button>
   </form>
 </div>
 

@@ -473,3 +473,323 @@ input, select {
   .sheet { animation: none; }
   .btn:active { transform: none; }
 }
+
+/* ======================================================================
+   v2 additions: OTP onboarding, dark dashboard, profile/settings/admin
+   ====================================================================== */
+
+.brand-center { flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.brand-center .brand-name { font-size: 1.3rem; }
+
+.auth-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.3rem;
+  margin: 4px 0 4px;
+}
+.auth-sub { margin: 0 0 18px; color: var(--slate); font-size: 0.88rem; }
+.demo-note {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(184, 146, 90, 0.18);
+  color: var(--brass-deep);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.demo-note:empty { display: none; }
+.dot { color: var(--slate); margin: 0 4px; }
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--brass-deep);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0;
+}
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+.favorites-quickpick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: -6px 0 2px;
+}
+.favorite-chip {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+/* --- Returning-user (device unlock) screen --- */
+.returning-avatar {
+  width: 72px;
+  height: 72px;
+  margin: 8px auto 14px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--bone);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+}
+.returning-name {
+  text-align: center;
+  font-weight: 700;
+  margin: 0 0 2px;
+}
+.returning-phone {
+  text-align: center;
+  color: var(--slate);
+  font-size: 0.85rem;
+  margin: 0 0 24px;
+}
+.fingerprint-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: var(--ink);
+  color: var(--bone);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.fingerprint-icon { font-size: 1.2rem; }
+.returning-links {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+  font-size: 0.85rem;
+}
+
+/* --- Dark dashboard shell --- */
+#app-view { background: var(--onyx, #14141a); min-height: 100vh; }
+:root { --onyx: #14141a; --panel: #1e1e26; --panel-2: #262631; --bone-dim2: rgba(246,242,233,0.55); }
+
+.page { padding-bottom: 90px; }
+.page.is-hidden { display: none; }
+
+.app-header { color: var(--bone); }
+.app-header .eyebrow { color: var(--bone-dim2); }
+.app-header h1 { color: var(--bone); font-family: var(--font-display); }
+.app-header .icon-btn { background: var(--panel); border-color: rgba(246,242,233,0.12); color: var(--bone); font-size: 1.1rem; }
+
+.balance-sub-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 6px 0 20px;
+}
+.balance-sub-row .account-number { margin: 0; }
+.text-link {
+  background: none;
+  border: none;
+  color: var(--brass);
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 0;
+}
+.balance-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.eye-btn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: rgba(246,242,233,0.7);
+}
+
+.ledger { color: var(--bone); }
+.ledger-heading h2 { color: var(--bone); }
+.ledger-list { border-top-color: rgba(246,242,233,0.12); }
+.ledger-row { border-bottom-color: rgba(246,242,233,0.1); }
+.ledger-row-title { color: var(--bone); }
+.ledger-row-meta { color: rgba(246,242,233,0.5); }
+.ledger-row-clickable { cursor: pointer; }
+.empty-state { color: rgba(246,242,233,0.5); }
+
+.ledger-list-page { margin: 0 20px; }
+
+/* --- Sub-pages (history, profile, settings, favorites, admin) --- */
+.sub-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 20px 16px;
+  color: var(--bone);
+}
+.sub-header h1 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.25rem;
+  margin: 0;
+}
+.sub-header .icon-btn {
+  background: var(--panel);
+  border: 1px solid rgba(246,242,233,0.12);
+  color: var(--bone);
+  font-size: 1.3rem;
+  width: 36px;
+  height: 36px;
+}
+
+/* --- Bottom nav --- */
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  background: var(--panel);
+  border-top: 1px solid rgba(246,242,233,0.08);
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  z-index: 30;
+}
+.bottom-nav.is-hidden { display: none; }
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  color: rgba(246,242,233,0.5);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 0;
+}
+.nav-icon { font-size: 1.15rem; }
+.nav-btn.is-active { color: var(--brass); }
+
+/* --- Profile page --- */
+.profile-photo-wrap { text-align: center; padding: 8px 20px 20px; }
+.profile-photo {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--panel-2);
+  font-size: 2rem;
+  cursor: pointer;
+  overflow: hidden;
+}
+.profile-photo img { width: 100%; height: 100%; object-fit: cover; }
+.photo-cam {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--brass);
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+.profile-name {
+  color: var(--bone);
+  font-weight: 700;
+  margin: 12px 0 0;
+}
+
+.detail-card {
+  margin: 0 20px 16px;
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 4px 16px;
+}
+.detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(246,242,233,0.08);
+  color: rgba(246,242,233,0.7);
+  font-size: 0.9rem;
+}
+.detail-row:last-child { border-bottom: none; }
+.detail-value { color: var(--bone); font-weight: 600; }
+.tier-badge {
+  background: rgba(184, 146, 90, 0.2);
+  color: var(--brass);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.detail-row-edit { flex-direction: column; align-items: stretch; gap: 6px; }
+.detail-row-edit input,
+.detail-row-edit select {
+  background: var(--panel-2);
+  border: 1px solid rgba(246,242,233,0.12);
+  border-radius: 8px;
+  padding: 10px;
+  color: var(--bone);
+  font-size: 0.9rem;
+}
+.detail-form { padding-bottom: 16px; }
+.btn-block { width: 100%; margin-top: 10px; }
+
+/* --- Settings page --- */
+.settings-group {
+  margin: 0 20px 20px;
+  background: var(--panel);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(246,242,233,0.08);
+  padding: 16px;
+  color: var(--bone);
+  font-size: 0.92rem;
+  text-align: left;
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-row .chev { color: rgba(246,242,233,0.4); }
+.settings-row-danger { color: var(--rust); justify-content: flex-start; }
+
+/* --- Admin page --- */
+.admin-sub { color: rgba(246,242,233,0.5); margin: 0 20px 8px; font-size: 0.85rem; }
+.admin-detail-name {
+  color: var(--bone);
+  font-family: var(--font-display);
+  margin: 0 20px 4px;
+  font-size: 1.1rem;
+}
+.admin-detail-meta { color: rgba(246,242,233,0.5); margin: 0 20px 16px; font-size: 0.85rem; }
+#admin-back-to-list {
+  margin: 20px 20px 0;
+  display: inline-block;
+  background: none;
+  border: none;
+  color: var(--brass);
+  font-weight: 600;
+}
