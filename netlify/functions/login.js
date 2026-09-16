@@ -1,5 +1,5 @@
 const {
-  readDB, verifyPassword, createToken, publicUser, json, parseBody,
+  readDB, verifySecret, createToken, publicUser, normalizePhone, json, parseBody,
 } = require('./_shared/helpers');
 
 exports.handler = async (event) => {
@@ -11,13 +11,14 @@ exports.handler = async (event) => {
   } catch (e) {
     return json(400, { error: e.message });
   }
-  const { email, password } = body;
+  const phone = normalizePhone(body.phone);
+  const { password } = body;
 
   const db = await readDB(event);
-  const user = db.users.find((u) => u.email.toLowerCase() === (email || '').toLowerCase());
+  const user = db.users.find((u) => u.phone === phone);
 
-  if (!user || !verifyPassword(password || '', user.passwordSalt, user.passwordHash)) {
-    return json(401, { error: 'Incorrect email or password.' });
+  if (!user || !verifySecret(password || '', user.passwordSalt, user.passwordHash)) {
+    return json(401, { error: 'Incorrect phone number or password.' });
   }
 
   const token = createToken(user.id);

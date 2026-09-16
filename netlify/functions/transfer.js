@@ -1,5 +1,6 @@
 const {
-  readDB, writeDB, getAuthedUser, toCents, publicUser, recordTransaction, json, parseBody,
+  readDB, writeDB, getAuthedUser, verifySecret, toCents, publicUser,
+  recordTransaction, findUserByIdentifier, json, parseBody,
 } = require('./_shared/helpers');
 
 exports.handler = async (event) => {
@@ -15,24 +16,25 @@ exports.handler = async (event) => {
   } catch (e) {
     return json(400, { error: e.message });
   }
-  const { recipient, amount, note } = body;
+  const { recipient, amount, note, pin } = body;
   const cents = toCents(amount);
 
   if (!Number.isFinite(cents) || cents <= 0) {
     return json(400, { error: 'Enter an amount greater than zero.' });
   }
   if (!recipient) {
-    return json(400, { error: "Enter the recipient's email or account number." });
+    return json(400, { error: "Enter the recipient's phone number, account number, or email." });
+  }
+  if (!user.pinHash) {
+    return json(400, { error: 'Please set a transaction PIN in Settings first.' });
+  }
+  if (!verifySecret(pin || '', user.pinSalt, user.pinHash)) {
+    return json(401, { error: 'Incorrect PIN.' });
   }
 
-  const target = db.users.find(
-    (u) =>
-      u.id !== user.id &&
-      (u.email.toLowerCase() === String(recipient).toLowerCase() ||
-        u.accountNumber === String(recipient))
-  );
-  if (!target) {
-    return json(404, { error: 'No wallet found for that email or account number.' });
+  const target = findUserByIdentifier(db, recipient);
+  if (!target || target.id === user.id) {
+    return json(404, { error: 'No wallet found for that phone number, account number, or email.' });
   }
   if (user.balanceCents < cents) {
     return json(400, { error: 'Insufficient balance for this transfer.' });

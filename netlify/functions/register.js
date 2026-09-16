@@ -1,6 +1,6 @@
 const {
-  readDB, writeDB, hashPassword, createToken, genId, genAccountNumber,
-  isValidEmail, publicUser, recordTransaction, json, parseBody,
+  readDB, writeDB, hashSecret, createToken, genId, normalizePhone,
+  publicUser, recordTransaction, json, parseBody, getAdminPhone,
 } = require('./_shared/helpers');
 
 exports.handler = async (event) => {
@@ -12,29 +12,49 @@ exports.handler = async (event) => {
   } catch (e) {
     return json(400, { error: e.message });
   }
-  const { name, email, password } = body;
+  const phone = normalizePhone(body.phone);
+  const { name, password, pin } = body;
 
-  if (!name || !isValidEmail(email) || !password || password.length < 6) {
+  if (!name || !password || password.length < 6) {
     return json(400, {
-      error: 'Provide a name, a valid email, and a password of at least 6 characters.',
+      error: 'Provide a name and a password of at least 6 characters.',
     });
+  }
+  if (!pin || !/^\d{4}$/.test(String(pin))) {
+    return json(400, { error: 'Choose a 4-digit transaction PIN.' });
   }
 
   const db = await readDB(event);
+  const otpEntry = (db.otps || {})[phone];
 
-  if (db.users.some((u) => u.email.toLowerCase() === email.toLowerCase())) {
-    return json(409, { error: 'An account with that email already exists.' });
+  if (!otpEntry || !otpEntry.verified || Date.now() > otpEntry.expiresAt) {
+    return json(400, { error: 'Please verify your phone number first.' });
+  }
+  if (db.users.some((u) => u.phone === phone)) {
+    return json(409, { error: 'That phone number already has a wallet.' });
   }
 
-  const { salt, hash } = hashPassword(password);
+  const { salt: passwordSalt, hash: passwordHash } = hashSecret(password);
+  const { salt: pinSalt, hash: pinHash } = hashSecret(pin);
+
   const user = {
     id: genId(),
     name,
-    email,
-    passwordSalt: salt,
-    passwordHash: hash,
-    accountNumber: genAccountNumber(db),
+    phone,
+    accountNumber: phone,
+    email: null,
+    passwordSalt,
+    passwordHash,
+    pinSalt,
+    pinHash,
     balanceCents: 0,
+    tier: 1,
+    isAdmin: getAdminPhone() && phone === getAdminPhone(),
+    gender: null,
+    dateOfBirth: null,
+    address: null,
+    photo: null,
+    favorites: [],
     createdAt: new Date().toISOString(),
   };
   db.users.push(user);
@@ -46,6 +66,7 @@ exports.handler = async (event) => {
     description: 'Wallet account opened',
   });
 
+  delete db.otps[phone];
   await writeDB(event, db);
 
   const token = createToken(user.id);
