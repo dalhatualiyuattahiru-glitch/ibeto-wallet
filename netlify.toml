@@ -1,0 +1,11 @@
+[build]
+  publish = "frontend"
+  functions = "netlify/functions"
+
+# The frontend calls /api/register, /api/login, etc. This forwards each
+# of those to the Netlify Function of the same name (e.g. /api/pay-bill
+# -> /.netlify/functions/pay-bill) without changing the URL in the browser.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200

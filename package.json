@@ -1,0 +1,12 @@
+{
+  "name": "ibeto-backend",
+  "version": "1.0.0",
+  "description": "Zero-dependency Node.js backend for the ibeto wallet app",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
